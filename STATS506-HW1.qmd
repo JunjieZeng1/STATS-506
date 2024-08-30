@@ -89,6 +89,43 @@ nrow(dfwine[dfwine$Proanthocyanins - dfwine$Ash > 0,]) / nrow(dfwine)
 
 
 
+### 1.d
+```{r}
+# Compute averages
+mean_var <- rep(NA, 13)
+mean_var1 <- rep(NA, 13)
+mean_var2 <- rep(NA, 13)
+mean_var3 <- rep(NA, 13)
+
+for (i in 2:ncol(dfwine)){
+  mean_var[i - 1] = mean(dfwine[, i])
+  mean_var1[i - 1] = mean(dfwine[dfwine$class == 1, i])
+  mean_var2[i - 1] = mean(dfwine[dfwine$class == 2, i])
+  mean_var3[i - 1] = mean(dfwine[dfwine$class == 3, i])
+}
+
+mean_var
+mean_var1
+mean_var2
+mean_var3
+```
+
+```{r}
+# Create a table
+df_mean <- t(data.frame(overall_mean = mean_var,
+                    class1_mean = mean_var1,
+                    class2_mean = mean_var2,
+                    class3_mean = mean_var3))
+table_mean <- as.table(df_mean)
+colnames(table_mean) <- colnames(dfwine[,-1])
+```
+```{r}
+table_mean
+```
+### 1.e
+```{r}
+
+```
 
 
 ## Quarto
