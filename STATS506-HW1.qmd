@@ -27,20 +27,53 @@ head(dfwine)
 The number of wines within each class indeed matches the numbers reported in "wine.names", which are 59, 71, and 48 respectively.
 
 ```{r}
+# Create new dataframes for different classes
+dfwine1 <- dfwine[dfwine$class == 1, ]
+dfwine2 <- dfwine[dfwine$class == 2, ]
+dfwine3 <- dfwine[dfwine$class == 3, ]
+```
+
+```{r}
 # Check the number of wines within each class
-nrow(dfwine[dfwine$class == 1, ])
-nrow(dfwine[dfwine$class == 2, ])
-nrow(dfwine[dfwine$class == 3, ])
+nrow(dfwine1)
+nrow(dfwine2)
+nrow(dfwine3)
 ```
 
 ### 1.c
 
 #### 1.c.1
 
+The correlation between alcohol content and color intensity is `cor(dfwine$Alcohol, dfwine$Color_intensity)`
+
+```{r}
+# Compute the correlation of alcohol vs color intensity
+cor(dfwine$Alcohol, dfwine$Color_intensity)
+```
+
+#### 1.c.2
+Class 1 has the highest correlation, which is 0.4082913. Class 2 has the lowest correlation, which is 0.2697891.
+```{r}
+# Compute correlation above for different classes
+cor1 <- cor(dfwine1$Alcohol, dfwine1$Color_intensity)
+cor2 <- cor(dfwine2$Alcohol, dfwine2$Color_intensity)
+cor3 <- cor(dfwine3$Alcohol, dfwine3$Color_intensity)
+cor1
+cor2
+cor3
+```
+```{r}
+# Find the highest and lowest correlation
+cors <- c(cor1, cor2, cor3)
+max(cors)
+min(cors)
+```
+
 ```{r}
 
-
 ```
+
+
 
 ## Quarto
 
