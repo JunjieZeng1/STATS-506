@@ -18,7 +18,7 @@ dfwine <- read.table("/Users/junjiezeng/Desktop/wine/wine.data", sep = ",")
 
 ```{r}
 # Change column names
-names(dfwine) <- c("Class", "Alcohol", "Malic_acid", "Ash", "Alcalinity_of_ash", "Magnesium", "Total_phenols", "Flavanoids", "Nonflavanoid_phenols", "Proanthocyanins","Color_intensity", "Hue", "OD280/OD315_of_diluted_wines", "Proline")
+names(dfwine) <- c("class", "Alcohol", "Malicacid", "Ash", "Alcalinity_of_ash", "Magnesium", "Total_phenols", "Flavanoids", "Nonflavanoid_phenols", "Proanthocyanins","Color_intensity", "Hue", "OD280_OD315_of_diluted_wines", "Proline")
 head(dfwine)
 ```
 
@@ -28,9 +28,9 @@ The number of wines within each class indeed matches the numbers reported in "wi
 
 ```{r}
 # Check the number of wines within each class
-nrow(dfwine[dfwine$Class == 1, ])
-nrow(dfwine[dfwine$Class == 2, ])
-nrow(dfwine[dfwine$Class == 3, ])
+nrow(dfwine[dfwine$class == 1, ])
+nrow(dfwine[dfwine$class == 2, ])
+nrow(dfwine[dfwine$class == 3, ])
 ```
 
 ### 1.c
