@@ -122,9 +122,12 @@ colnames(table_mean) <- colnames(dfwine[,-1])
 ```{r}
 table_mean
 ```
-### 1.e
-```{r}
 
+### 1.e
+Both t-test result rejected the null hypothesis with very small p-values, suggesting the level of phenols differs across the three classes. 
+```{r}
+t.test(dfwine1$Total_phenols, dfwine2$Total_phenols)
+t.test(dfwine2$Total_phenols, dfwine3$Total_phenols)
 ```
 
 
