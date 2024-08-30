@@ -52,7 +52,9 @@ cor(dfwine$Alcohol, dfwine$Color_intensity)
 ```
 
 #### 1.c.2
+
 Class 1 has the highest correlation, which is 0.4082913. Class 2 has the lowest correlation, which is 0.2697891.
+
 ```{r}
 # Compute correlation above for different classes
 cor1 <- cor(dfwine1$Alcohol, dfwine1$Color_intensity)
@@ -62,6 +64,7 @@ cor1
 cor2
 cor3
 ```
+
 ```{r}
 # Find the highest and lowest correlation
 cors <- c(cor1, cor2, cor3)
@@ -70,10 +73,21 @@ min(cors)
 ```
 
 #### 1.c.3
-The alcohol content of the wine with the highest color intensity is 14.34. 
+
+The alcohol content of the wine with the highest color intensity is 14.34.
+
 ```{r}
 dfwine[dfwine$Color_intensity == max(dfwine$Color_intensity),]$Alcohol
 ```
+
+#### 1.c.4
+About 8.43 percent of wines had a higher content of proanthocyanins compare to ash. 
+```{r}
+# Computing percentage
+nrow(dfwine[dfwine$Proanthocyanins - dfwine$Ash > 0,]) / nrow(dfwine)
+```
+
+
 
 
 
