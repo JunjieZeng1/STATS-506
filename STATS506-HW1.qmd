@@ -69,8 +69,10 @@ max(cors)
 min(cors)
 ```
 
+#### 1.c.3
+The alcohol content of the wine with the highest color intensity is 14.34. 
 ```{r}
-
+dfwine[dfwine$Color_intensity == max(dfwine$Color_intensity),]$Alcohol
 ```
 
 
