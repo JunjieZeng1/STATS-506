@@ -1,0 +1,50 @@
+---
+title: "STATS506-HW1-JunjieZeng"
+author: "Junjie Zeng"
+format: html
+editor: visual
+---
+
+# STATS506 Problem Set #1
+
+## Problem 1 - Wine Data
+
+### 1.a
+
+```{r}
+# Loading data
+dfwine <- read.table("/Users/junjiezeng/Desktop/wine/wine.data", sep = ",")
+```
+
+```{r}
+# Change column names
+names(dfwine) <- c("Class", "Alcohol", "Malic_acid", "Ash", "Alcalinity_of_ash", "Magnesium", "Total_phenols", "Flavanoids", "Nonflavanoid_phenols", "Proanthocyanins","Color_intensity", "Hue", "OD280/OD315_of_diluted_wines", "Proline")
+head(dfwine)
+```
+
+### 1.b
+```{r}
+nrow()
+```
+
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
