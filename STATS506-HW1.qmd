@@ -130,24 +130,36 @@ t.test(dfwine1$Total_phenols, dfwine2$Total_phenols)
 t.test(dfwine2$Total_phenols, dfwine3$Total_phenols)
 ```
 
-
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
+## Problem 2
+### 2.a
 ```{r}
-1 + 1
+# Import data
+dfmanager <- read.table("AskAManager.csv", sep = ",", header = TRUE)
 ```
 
-You can add options to executable code like this
-
+### 2.b
 ```{r}
-#| echo: false
-2 * 2
+# Set column names
+colnames(dfmanager) <- c("Number", "Timestamp", "Age", "Industry", "Position", "Position_supplement", "Salary", "Additional_compensation", "Currency", "Other_currency", "Income_supplement", "Country", "State", "City", "Overall_work_years", "Field_work_years", "Level_of_education", "Gender", "Race")
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+### 2.c
+```{r}
+# Filter out those being paid in US dollars (USD)
+nrow(dfmanager)
+dfmanager_usd <- dfmanager[dfmanager$Currency == "USD", ]
+nrow(dfmanager_usd)
+```
+
+### 2.d
+```{r}
+unique(dfmanager$Age)
+unique(dfmanager$Overall_work_years)
+unique(dfmanager$Field_work_years)
+```
+```{r}
+dfmanager_usd <- dfmanager_usd[!(dfmanager_usd$Age == "under 18"), ]
+```
+
+
+```
