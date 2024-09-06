@@ -162,4 +162,28 @@ dfmanager_usd <- dfmanager_usd[!(dfmanager_usd$Age == "under 18"), ]
 ```
 
 
+## Problem 3
+### 3.a
+
+
+```{r}
+# isPalindromic
+isPalindromic <- function(x){
+  # Check input
+  if (!is.numeric(x) | x <= 0 | x != as.integer(x)){
+    warning("x must be a positive integer")
+  }
+  
+  # Check whether palindrome
+  x_char <- as.character(x)
+  x_reversed <- rep(NA, nchar(x_char))
+  print(x_reversed)
+  for (i in 1:nchar(x_char)){
+    x_reversed[i] = x_char[nchar(x_char) - i + 1]
+  }
+  reversed <- as.integer(x_reversed)
+  print(reversed)
+
+}
+
 ```
