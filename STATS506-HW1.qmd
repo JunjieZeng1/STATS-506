@@ -174,16 +174,20 @@ isPalindromic <- function(x){
     warning("x must be a positive integer")
   }
   
-  # Check whether palindrome
+  # Convert
   x_char <- as.character(x)
-  x_reversed <- rep(NA, nchar(x_char))
-  print(x_reversed)
-  for (i in 1:nchar(x_char)){
-    x_reversed[i] = x_char[nchar(x_char) - i + 1]
-  }
-  reversed <- as.integer(x_reversed)
-  print(reversed)
-
+  x_splited <- strsplit(x_char, NULL)
+  x_reversed <- rev(x_splited[[1]])
+  x_new <- paste(x_reversed, collapse = "")
+  
+  # Set return values
+  reversed <- as.integer(x_new)
+  isPalindromic <- x == reversed
+  
+  # Create return list
+  return_list <- list(isPalindromic = isPalindromic, reversed = reversed)
+  
+  return(return_list)
 }
-
 ```
+
