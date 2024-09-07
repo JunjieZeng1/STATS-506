@@ -166,7 +166,10 @@ dfmanager_usd <- dfmanager_usd[!(dfmanager_usd$Age == "under 18"), ]
 ### 3.a
 
 ```{r}
-# isPalindromic
+#' Check if a given positive integer is a palindrome
+#' @param x a positive integer
+#' @return A list with two elements: isPalindromic: A logical value indicating if the input is palindromic. reversed: The input with its digits reversed.
+
 isPalindromic <- function(x){
   # Check input
   if (!is.numeric(x) | x <= 0 | x != as.integer(x)){
@@ -188,6 +191,9 @@ isPalindromic <- function(x){
 
 ### 3.b
 ```{r}
+#' Find the next palindromic number strictly greater than the input
+#' @param x a positive integer
+#' @return A vector of length 1 with the next palindromic number greater than the input
 nextPalindrome <- function(x){
   # Check input
   if (!is.numeric(x) | x <= 0 | x != as.integer(x)){
