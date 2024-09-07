@@ -205,4 +205,21 @@ nextPalindrome <- function(x){
 }
 ```
 
+### 3.c
 
+```{r}
+# 391
+nextPalindrome(391)
+
+# 9928
+nextPalindrome(9928)
+
+# 19272719
+nextPalindrome(19272719)
+
+# 109
+nextPalindrome(109)
+
+# 2
+nextPalindrome(2)
+```
