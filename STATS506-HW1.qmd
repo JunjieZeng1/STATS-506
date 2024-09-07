@@ -165,7 +165,6 @@ dfmanager_usd <- dfmanager_usd[!(dfmanager_usd$Age == "under 18"), ]
 ## Problem 3
 ### 3.a
 
-
 ```{r}
 # isPalindromic
 isPalindromic <- function(x){
@@ -176,18 +175,34 @@ isPalindromic <- function(x){
   
   # Convert
   x_char <- as.character(x)
-  x_splited <- strsplit(x_char, NULL)
-  x_reversed <- rev(x_splited[[1]])
+  x_splited <- strsplit(x_char, NULL)[[1]]
+  x_reversed <- rev(x_splited)
   x_new <- paste(x_reversed, collapse = "")
   
-  # Set return values
-  reversed <- as.integer(x_new)
-  isPalindromic <- x == reversed
-  
   # Create return list
-  return_list <- list(isPalindromic = isPalindromic, reversed = reversed)
+  return_list <- list(isPalindromic = (x == as.integer(x_new)), reversed = as.integer(x_new))
   
   return(return_list)
 }
 ```
+
+### 3.b
+```{r}
+nextPalindrome <- function(x){
+  # Check input
+  if (!is.numeric(x) | x <= 0 | x != as.integer(x)){
+    warning("x must be a positive integer")
+  }
+  
+  # Find the next Palindrome
+  x = as.integer(x) + 1
+  while (isPalindromic(x)$isPalindromic == FALSE){
+    x = x + 1
+  }
+  
+  # Return the next Palindrome
+  return(x)
+}
+```
+
 
