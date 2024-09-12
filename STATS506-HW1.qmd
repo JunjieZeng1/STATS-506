@@ -88,7 +88,6 @@ nrow(dfwine[dfwine$Proanthocyanins - dfwine$Ash > 0,]) / nrow(dfwine)
 ```
 
 
-
 ### 1.d
 ```{r}
 # Compute averages
@@ -147,20 +146,76 @@ colnames(dfmanager) <- c("Number", "Timestamp", "Age", "Industry", "Position", "
 ```{r}
 # Filter out those being paid in US dollars (USD)
 nrow(dfmanager)
-dfmanager_usd <- dfmanager[dfmanager$Currency == "USD", ]
-nrow(dfmanager_usd)
+dfmanager <- dfmanager[dfmanager$Currency == "USD", ]
+nrow(dfmanager)
 ```
 
 ### 2.d
 ```{r}
-unique(dfmanager$Age)
+# Eliminate rows with age "under 18"
+nrow(dfmanager[dfmanager$Age == "under 18", ])
+dfmanager <- dfmanager[!(dfmanager$Age == "under 18"), ]
+nrow(dfmanager)
+```
+```{r}
+# Find and compare categories in Overall_work_years and Field_work_years
 unique(dfmanager$Overall_work_years)
 unique(dfmanager$Field_work_years)
 ```
+
 ```{r}
-dfmanager_usd <- dfmanager_usd[!(dfmanager_usd$Age == "under 18"), ]
+# Factor both of the variables for further use, set levels
+dfmanager$Field_work_years <- factor(dfmanager$Field_work_years, 
+                        levels = c("1 year or less", "2 - 4 years", "5-7 years", "8 - 10 years", "11 - 20 years", "21 - 30 years", "31 - 40 years", "41 years or more"), 
+                        ordered = TRUE)
+dfmanager$Overall_work_years <- factor(dfmanager$Overall_work_years, 
+                                           levels = c("1 year or less", "2 - 4 years", "5-7 years", "8 - 10 years", "11 - 20 years", "21 - 30 years", "31 - 40 years", "41 years or more"), 
+                        ordered = TRUE)
+
 ```
 
+```{r}
+# Eliminate rows where Field_work_years > Overall_work_years
+nrow(dfmanager[dfmanager$Field_work_years > dfmanager$Overall_work_years,])
+
+dfmanager <- dfmanager[dfmanager$Field_work_years <= dfmanager$Overall_work_years,]
+
+nrow(dfmanager)
+```
+
+```{r}
+unique(dfmanager$Age)
+
+
+# Under 18
+# Overall_work_years or Field_work_years > Age
+# Field_work_years > Overall_work_years > Age
+```
+
+
+```{r}
+# Eliminate Field_work_years > Overall_work_years
+
+
+```
+
+### 2.e
+```{r}
+# Get a summary of salary
+summary(dfmanager$Salary)
+```
+```{r}
+# It is reasonable to remove the outlier
+q1 = 56200
+q3 = 112000
+iqr = q3 - q1
+lower_bound = q1 - 1.5 * iqr
+upper_bound = q3 + 1.5 * iqr
+
+
+dfmanager <- dfmanager[(dfmanager$Salary >= lower_bound) & (dfmanager$Salary <= upper_bound),]
+nrow(dfmanager)
+```
 
 ## Problem 3
 ### 3.a
