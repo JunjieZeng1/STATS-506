@@ -6,7 +6,8 @@ editor: visual
 ---
 
 # STATS506 Problem Set #1
-
+## Repository
+https://github.com/JunjieZeng1/STATS-506.git \\
 ## Problem 1 - Wine Data
 
 ### 1.a
