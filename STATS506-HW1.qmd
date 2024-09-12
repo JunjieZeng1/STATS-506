@@ -143,9 +143,11 @@ colnames(dfmanager) <- c("Number", "Timestamp", "Age", "Industry", "Position", "
 ```
 
 ### 2.c
+We see a tremendous decrease in our observations. And the amount matches with those not "USD". So we succeeded to restrict the data to those being paid in US dollars. 
 ```{r}
 # Filter out those being paid in US dollars (USD)
 nrow(dfmanager)
+nrow(dfmanager[!(dfmanager$Currency == "USD"), ])
 dfmanager <- dfmanager[dfmanager$Currency == "USD", ]
 nrow(dfmanager)
 ```
@@ -185,18 +187,27 @@ nrow(dfmanager)
 
 ```{r}
 unique(dfmanager$Age)
-
-
-# Under 18
-# Overall_work_years or Field_work_years > Age
-# Field_work_years > Overall_work_years > Age
 ```
 
 
 ```{r}
-# Eliminate Field_work_years > Overall_work_years
+# Eliminate impossible age and field_work_years
+# We use the maximum age of each category
+# It's not likely to start working at an age under 16
+dfmanager <- dfmanager[!(dfmanager$Age == "18-24" & dfmanager$Field_work_years %in% c("8 - 10 years", "11 - 20 years", "21 - 30 years", "31 - 40 years", "41 years or more")), ]
 
+dfmanager <- dfmanager[!(dfmanager$Age == "25-34" & dfmanager$Field_work_years %in% c("11 - 20 years", "21 - 30 years", "31 - 40 years", "41 years or more")), ]
 
+dfmanager <- dfmanager[!(dfmanager$Age == "35-44" & dfmanager$Field_work_years %in% c("21 - 30 years", "31 - 40 years", "41 years or more")), ]
+
+dfmanager <- dfmanager[!(dfmanager$Age == "45-54" & dfmanager$Field_work_years %in% c("31 - 40 years", "41 years or more")), ]
+
+dfmanager <- dfmanager[!(dfmanager$Age == "55-64" & dfmanager$Field_work_years %in% c("41 years or more")), ]
+```
+
+```{r}
+# Report final observations
+nrow(dfmanager)
 ```
 
 ### 2.e
@@ -216,10 +227,11 @@ upper_bound = q3 + 1.5 * iqr
 dfmanager <- dfmanager[(dfmanager$Salary >= lower_bound) & (dfmanager$Salary <= upper_bound),]
 nrow(dfmanager)
 ```
+Thresholds were chosen by analyzing the distribution of the data. Outlier were removed, and others were kept, which will help us to dig into data statistically. 
+
 
 ## Problem 3
 ### 3.a
-
 ```{r}
 #' Check if a given positive integer is a palindrome
 #' @param x a positive integer
