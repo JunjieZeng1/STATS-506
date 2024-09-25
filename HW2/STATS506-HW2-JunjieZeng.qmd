@@ -5,23 +5,32 @@ format: html
 editor: visual
 ---
 
-## Quarto
+# STATS506 Problem Set #2
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+## Repository
+https://github.com/JunjieZeng1/STATS-506.git
 
-## Running Code
+## Problem 1 Dice Game
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
+### a
+Version 1
 ```{r}
-1 + 1
+#'
+#'
+#'
+#'
+play_dice_v1 <- function(x){
+  net_win = 0
+  roll <- sample(c(1:6), size = 1)
+  for (i in 1:x){
+    if (roll %in% c(3, 5)){
+      net_win = net_win + 2 * roll
+    }
+    else{
+      net_win = net_win - roll
+    }
+  }
+  return net_win
+}
+
 ```
-
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
