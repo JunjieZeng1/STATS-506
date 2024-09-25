@@ -49,3 +49,37 @@ play_dice_vec <- function(x){
 ```
 
 Version3
+```{r}
+#' Function to simulate dice game using table()
+#'
+#' @param x a numeric number, the number of dice to roll
+#' @return Total winnings
+play_dice_tb <- function(x){
+  net_win = 0
+  roll <- sample(c(1:6), x, replace = TRUE)
+  table_roll <- table(roll)
+  if ("3" %in% names(table_roll)){
+    num_3 = as.integer(table_roll["3"])
+    net_win = net_win +  2 * 3 * num_3
+  }
+  
+  if ("5" %in% names(table_roll)){
+    num_5 = as.integer(table_roll["5"])
+    net_win = net_win +  2 * 5 * num_5
+  }
+  
+  net_win = net_win - 2 * x
+  
+  return(net_win)
+}
+```
+
+Version4
+```{r}
+#' Function to simulate dice game using 
+#'
+#' @param x a numeric number, the number of dice to roll
+#' @return Total winnings
+#' 
+
+```
