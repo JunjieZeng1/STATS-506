@@ -80,6 +80,12 @@ Version4
 #'
 #' @param x a numeric number, the number of dice to roll
 #' @return Total winnings
-#' 
 
+play_dice_apply <- function(x){
+  roll <- sample(c(1:6), x, replace = TRUE)
+  print(roll)
+  games <- sapply(roll, function(x){ifelse(roll %in% c(3, 5), 2 * roll - 2, -2)})
+  print(games)
+  return(sum(games[,1]))
+}
 ```
