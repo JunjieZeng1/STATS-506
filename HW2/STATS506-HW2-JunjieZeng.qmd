@@ -21,8 +21,9 @@ Version 1
 #' @return Total winnings
 play_dice_loop <- function(x){
   net_win = 0
-  roll <- sample(c(1:6), size = 1)
+
   for (i in 1:x){
+    roll <- sample(c(1:6), size = 1)
     if (roll %in% c(3, 5)){
       net_win = net_win + 2 * roll - 2
     }
@@ -97,3 +98,19 @@ for (i in c(3, 3000)){
   print(paste('Using sapply with', i, 'rolls:', play_dice_apply(i)))
 }
 ```
+
+### c
+```{r}
+for (i in c(3, 3000)){
+  set.seed(506)
+  print(paste('Using loop with', i, 'rolls:', play_dice_loop(i)))
+  set.seed(506)
+  print(paste('Using vectorized function with', i, 'rolls:', play_dice_vec(i)))
+  set.seed(506)
+  print(paste('Using table with', i, 'rolls:', play_dice_tb(i)))
+  set.seed(506)
+  print(paste('Using sapply with', i, 'rolls:', play_dice_apply(i)))
+}
+```
+
+We see that all the four versions give the same result for a given number of rolls. So those four versions are the same. 
