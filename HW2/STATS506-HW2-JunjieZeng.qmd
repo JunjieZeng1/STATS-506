@@ -8,12 +8,15 @@ editor: visual
 # STATS506 Problem Set #2
 
 ## Repository
+
 https://github.com/JunjieZeng1/STATS-506.git
 
 ## Problem 1 Dice Game
 
 ### a
+
 Version 1
+
 ```{r}
 #' Function to simulate dice game using a loop
 #'
@@ -36,6 +39,7 @@ play_dice_loop <- function(x){
 ```
 
 Version2
+
 ```{r}
 #' Function to simulate dice game using built-in R vectorized functions
 #'
@@ -50,6 +54,7 @@ play_dice_vec <- function(x){
 ```
 
 Version3
+
 ```{r}
 #' Function to simulate dice game using table()
 #'
@@ -76,6 +81,7 @@ play_dice_tb <- function(x){
 ```
 
 Version4
+
 ```{r}
 #' Function to simulate dice game using apply
 #'
@@ -84,12 +90,21 @@ Version4
 
 play_dice_apply <- function(x){
   roll <- sample(c(1:6), x, replace = TRUE)
-  games <- sapply(roll, function(x){ifelse(roll %in% c(3, 5), 2 * roll - 2, -2)})
-  return(sum(games[,1]))
+  games <- sapply(roll, function(x){
+    if (x %in% c(3, 5)){
+      num = x * 2 - 2
+      return(num)
+    }
+    else{
+      return(-2)
+    }
+  })
+  return(sum(games))
 }
 ```
 
 ### b
+
 ```{r}
 for (i in c(3, 3000)){
   print(paste('Using loop with', i, 'rolls:', play_dice_loop(i)))
@@ -100,6 +115,7 @@ for (i in c(3, 3000)){
 ```
 
 ### c
+
 ```{r}
 for (i in c(3, 3000)){
   set.seed(506)
@@ -113,4 +129,26 @@ for (i in c(3, 3000)){
 }
 ```
 
-We see that all the four versions give the same result for a given number of rolls. So those four versions are the same. 
+We see that all the four versions give the same result for a given number of rolls. So those four versions are the same.
+
+### d
+```{r}
+library(microbenchmark)
+```
+```{r}
+microbenchmark(play_dice_loop(1000), play_dice_vec(1000), play_dice_tb(1000), play_dice_apply(1000))
+```
+```{r}
+microbenchmark(play_dice_loop(100000), play_dice_vec(100000), play_dice_tb(100000), play_dice_apply(100000))
+```
+The first table with input(1000) has unit in microseconds.The second table with input(100000) has unit in milliseconds. 
+In both tables, we see the speed rank as follows: play_dice_tb > play_dice_vec >> play_dice_apply >> play_dice_loop. This is especially significant when input is large. 
+
+### e
+```{r}
+set.seed(506)
+play_dice_tb(100000)
+```
+Based on a Monte Carlo simulation with 100000 runs, the final net gain is 67796, suggesting this is a unfair game. 
+
+
