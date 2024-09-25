@@ -15,11 +15,11 @@ https://github.com/JunjieZeng1/STATS-506.git
 ### a
 Version 1
 ```{r}
+#' Function to simulate dice game using a loop
 #'
-#'
-#'
-#'
-play_dice_v1 <- function(x){
+#' @param x a numeric number, the number of dice to roll
+#' @return Total winnings
+play_dice_loop <- function(x){
   net_win = 0
   roll <- sample(c(1:6), size = 1)
   for (i in 1:x){
@@ -30,7 +30,23 @@ play_dice_v1 <- function(x){
       net_win = net_win - roll
     }
   }
-  return net_win
+  return(net_win)
 }
-
 ```
+
+Version2
+```{r}
+#' Function to simulate dice game using built-in R vectorized functions
+#'
+#' @param x a numeric number, the number of dice to roll
+#' @return Total winnings
+play_dice_vec <- function(x){
+  net_win = 0
+  rolls <- sample(c(1:6), x, replace = TRUE)
+  ifelse(rolls %in% c(3, 5), 
+         net_win = net_win + 2 * rolls, 
+         net_win = net_win - rolls)
+  return(net_win)
+}
+```
+
