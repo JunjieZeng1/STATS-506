@@ -24,10 +24,10 @@ play_dice_loop <- function(x){
   roll <- sample(c(1:6), size = 1)
   for (i in 1:x){
     if (roll %in% c(3, 5)){
-      net_win = net_win + 2 * roll
+      net_win = net_3in + 2 * roll - 2
     }
     else{
-      net_win = net_win - roll
+      net_win = net_win - 2
     }
   }
   return(net_win)
@@ -41,12 +41,11 @@ Version2
 #' @param x a numeric number, the number of dice to roll
 #' @return Total winnings
 play_dice_vec <- function(x){
-  net_win = 0
-  rolls <- sample(c(1:6), x, replace = TRUE)
-  ifelse(rolls %in% c(3, 5), 
-         net_win = net_win + 2 * rolls, 
-         net_win = net_win - rolls)
+  roll <- sample(c(1:6), x, replace = TRUE)
+  games <- ifelse(roll %in% c(3, 5), roll * 2 - 2 , -2)
+  net_win = sum(games)
   return(net_win)
 }
 ```
 
+Version3
