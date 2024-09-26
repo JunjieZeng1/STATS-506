@@ -1,7 +1,9 @@
 ---
 title: "STATS506-HW2-JunjieZeng"
 author: "JunjieZeng"
-format: html
+format: 
+  html:
+    embed-resources: true
 editor: visual
 ---
 
@@ -241,10 +243,40 @@ interact_plot(lm2, pred = `EI:ES_torque`, modx = `EI:ES_horsepower`,
 From the interaction plot, we see a negative relationship between torque and log highway MPG. Also, Higher horsepower has higher log highway MPG compared to those with lower horsepower. In addition, log highway MPG drops more steeply as torque increases for lower horsepower. 
 
 ### f
+```{r}
+# Create dummy variable year
+library(dplyr)
 
+data <- data1 %>%
+  mutate(
+    y2010 = ifelse(`ID:Year`== 2010, 1, 0),
+    y2011 = ifelse(`ID:Year` == 2011, 1, 0),
+    y2012 = ifelse(`ID:Year` == 2012, 1, 0)
+  )
 
+```
+```{r}
+#Construct X and Y
+X <- cbind(1, data1$`EI:ES_torque`, 
+           data$y2010,
+           data$y2011,
+           data$y2012,
+           data1$`EI:ES_horsepower`, 
+           data1$`Dim:Height`, 
+           data1$`Dim:Length`, 
+           data1$`Dim:Width`
+           )
 
+Y <- data1$log_highway_mpg
+```
 
+```{r}
+# Solve for beta_hat
+beta_hat <- solve(t(X) %*% X) %*% t(X) %*% Y
+beta_hat
+```
+
+We see the beta hat we get equal to what we get in part d. 
 
 
 
