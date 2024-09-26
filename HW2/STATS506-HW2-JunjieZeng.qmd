@@ -151,4 +151,112 @@ play_dice_tb(100000)
 ```
 Based on a Monte Carlo simulation with 100000 runs, the final net gain is 67796, suggesting this is a unfair game. 
 
+## Problem 2 Linear Regression
+### a
+```{r}
+# Load data
+data <- read.csv("/Users/junjiezeng/Desktop/git/STATS506/HW2/cars.csv")
+```
+```{r}
+# Change column names
+colnames(data) <- c("Dim:Height", 
+                    "Dim:Length",
+                    "Dim:Width",
+                    "EI:Driveline",
+                    "EI:Engine_type",
+                    "EI:Hybrid",
+                    "EI:Num_f_gears",
+                    "EI:Transmission",
+                    "FI:City_mpg",
+                    "FI:Fuel_type",
+                    "FI:Highway_mpg",
+                    "ID:Class",
+                    "ID:ID",
+                    "ID:Make",
+                    "ID:Model_year",
+                    "ID:Year",
+                    "EI:ES_horsepower",
+                    "EI:ES_torque")
+```
+
+### b
+```{r}
+# Restrict the data to cars whose Fuel Type is “Gasoline”
+data1 <- data[data$`FI:Fuel_type` == 'Gasoline', ]
+```
+
+### c
+```{r}
+# Create a boxplot
+boxplot(data1$`FI:Highway_mpg`)
+
+# Remove the largest outlier to show the grpah
+hist(data1$`FI:Highway_mpg`[data1$`FI:Highway_mpg` < 200])
+```
+We see the graph is right skewed, so we better do a log-transformation on our data.     
+
+```{r}
+# Create a new variable with log-transformation on highway mpg
+data1['log_highway_mpg'] <- log(data1$`FI:Highway_mpg`)
+```
+```{r}
+# Look at the distribution of log highway mpg
+hist(data1$log_highway_mpg, nclass = 30)
+```
+We see it looks more symmetrical except the large ourlier at 5.5.    
+
+### d
+```{r}
+# Linear regression model
+lm1 <- lm(log_highway_mpg ~ `EI:ES_torque` + as.factor(`ID:Year`) + `EI:ES_horsepower` + `Dim:Height` + `Dim:Length` + `Dim:Width`,data = data1)
+
+# Summary of the model
+summary(lm1)
+```
+The regression estimate a negative relationship between highway MPG and torque. The slope for torque is -0.00229, the baseline is the car released in 2009, suggesting that holding all else constant, one unit increase in torque is associated with approximately -0.00229 units decrease in log highway MPG.    
+
+### e
+```{r}
+# Refit with interaction terms
+lm2 <- lm(log_highway_mpg ~ `EI:ES_torque`*`EI:ES_horsepower`+ as.factor(`ID:Year`)  + `Dim:Height` + `Dim:Length` + `Dim:Width`,data = data1)
+
+# Summary of the model
+summary(lm2)
+```
+```{r}
+library(interactions)
+```
+
+```{r}
+# Plot interaction
+interact_plot(lm2, pred = `EI:ES_torque`, modx = `EI:ES_horsepower`, 
+  modx.values = c(100, 250, 400),  
+  at = list(`ID:Year` = 2010),  
+  x.label = "Torque",
+  y.label = "log Highway MPG",
+  legend.main = "Horsepower",
+  data = data1
+)
+```
+From the interaction plot, we see a negative relationship between torque and log highway MPG. Also, Higher horsepower has higher log highway MPG compared to those with lower horsepower. In addition, log highway MPG drops more steeply as torque increases for lower horsepower. 
+
+### f
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
