@@ -1,0 +1,207 @@
+---
+title: "STATS506-HW3-JunjieZeng"
+author: "Junjie Zeng"
+format: html
+editor: visual
+---
+# STATS506 Problem Set #2
+
+## Repository
+
+https://github.com/JunjieZeng1/STATS-506.git
+
+## Problem 1 Dice Game
+
+### a
+```{r, warning = False}
+# Load packages
+library(haven)
+library(dplyr)
+library(knitr)
+library(tidyr)
+library(broom)
+library(pscl)
+library(DescTools)
+```
+
+```{r}
+# Load data
+vix_d <- read_xpt("/Users/junjiezeng/Desktop/git/STATS506/VIX_D.XPT")
+demo_d <- read_xpt("/Users/junjiezeng/Desktop/git/STATS506/DEMO_D.XPT")
+```
+
+```{r}
+# Merging data
+df <- data.frame(inner_join(vix_d, demo_d, by = "SEQN"))
+head(df)
+```
+
+```{r}
+# Check sample size is 6980
+nrow(df)
+```
+
+### b
+```{r}
+# Create age categories
+df <- df |> 
+  mutate(age_levels = cut(RIDAGEYR, breaks = seq(0, 90, by = 10), right = FALSE, 
+                          labels = c("0-9", "10-19", "20-29", "30-39", "40-49", 
+                                      "50-59", "60-69", "70-79", "80+")))
+```
+
+```{r}
+glass_prop <- df |> 
+  select(c(VIQ220, age_levels)) |> 
+  filter(VIQ220 %in% c(1,2)) |> 
+  group_by(age_levels) |> 
+  summarize(glass = sum(VIQ220 == 1), 
+            total = n(), 
+            proportion = sum(VIQ220 == 1) / total)
+```
+
+```{r}
+# Create a table using kable
+kable(glass_prop, 
+      format = "html", 
+      caption = "Proportion of Wearing Glasses/Contact Lenses", 
+      col.names = c("Age", "Wearing Glasses/Contacts", "Total", "Proportion"),
+      digits = 2)
+```
+
+### c
+```{r}
+# Clean the data
+df_cleaned_for_pc <- df |> 
+  select(c(VIQ220, INDFMPIR, RIDAGEYR, RIAGENDR, RIDRETH1)) |> 
+  drop_na(VIQ220) |> 
+  mutate(is_glass = ifelse(VIQ220 == 1, 1, 0), 
+         gender = as.factor(RIAGENDR), 
+         race = as.factor(RIDRETH1), 
+         age = RIDAGEYR, 
+         PIR = INDFMPIR)
+```
+
+```{r}
+# Model 1
+model1 <- glm(is_glass ~ age, data = df_cleaned_for_pc, family = "binomial")
+
+# Model 2
+model2 <- glm(is_glass ~ age + race + gender, data = df_cleaned_for_pc, family = "binomial")
+
+# Model 3
+model3 <- glm(is_glass ~ age + race + gender + PIR, data = df_cleaned_for_pc, family = "binomial")
+```
+
+```{r}
+
+model_summary <- function(lg) {
+  odds_ratio <- exp(coef(lg))
+  pseudo_r2 <- PseudoR2(lg)["McFadden"]
+  aic <- lg$aic
+  sample_size <- nrow(lg$model)
+  
+  return(list(odds_ratio = odds_ratio, 
+              pseudo_r2 = pseudo_r2, 
+              AIC = aic, 
+              sample_size = sample_size))
+}
+
+
+model1_summary <- model_summary(model1)
+model2_summary <- model_summary(model2)
+model3_summary <- model_summary(model3)
+```
+
+```{r}
+table_models <- data.frame(
+  Model = c("Age", 
+            "Age, Race, Gender", 
+            "Age, Race, Gender, PIR"),
+  
+  Odds_Ratio_Intercept = c(round(model1_summary$odds_ratio[1], 2),
+                           round(model2_summary$odds_ratio[1], 2),
+                           round(model3_summary$odds_ratio[1], 2)),
+  
+  Odds_Ratio_Age = c(round(model1_summary$odds_ratio[2], 2),
+                     round(model2_summary$odds_ratio[2], 2),
+                     round(model3_summary$odds_ratio[2], 2)),
+  
+  Odds_Ratio_Female = c(round(model1_summary$odds_ratio[7], 2),
+                        round(model2_summary$odds_ratio[7], 2),
+                        round(model3_summary$odds_ratio[7], 2)),
+  
+  Odds_Ratio_Other_Hispanic = c(round(model1_summary$odds_ratio[3], 2),
+                                round(model2_summary$odds_ratio[3], 2),
+                                round(model3_summary$odds_ratio[3], 2)),
+    
+  Odds_Ratio_Non_Hispanic_White = c(round(model1_summary$odds_ratio[4], 2),
+                                    round(model2_summary$odds_ratio[4], 2),
+                                    round(model3_summary$odds_ratio[4], 2)),
+  
+  Odds_Ratio_Non_Hispanic_Black = c(round(model1_summary$odds_ratio[5], 2),
+                                    round(model2_summary$odds_ratio[5], 2),
+                                    round(model3_summary$odds_ratio[5], 2)),
+  
+  Odds_Ratio_Other_Race = c(round(model1_summary$odds_ratio[6], 2),
+                                  round(model2_summary$odds_ratio[6], 2),
+                                  round(model3_summary$odds_ratio[6], 2)),
+  
+  Odds_Ratio_PIR = c(round(model1_summary$odds_ratio[8], 2),
+                     round(model2_summary$odds_ratio[8], 2),
+                     round(model3_summary$odds_ratio[8], 2)),
+  
+  Sample_Size = c(model1_summary$sample_size, 
+                  model2_summary$sample_size, 
+                  model3_summary$sample_size),
+  
+  Pseudo_R2 = c(round(model1_summary$pseudo_r2, 4),
+                round(model2_summary$pseudo_r2, 4),
+                round(model3_summary$pseudo_r2, 4)),
+  
+  AIC = c(model1_summary$AIC, 
+          model2_summary$AIC, 
+          model3_summary$AIC)
+)
+```
+
+```{r}
+kable(table_models, 
+      format = "html", 
+      col.names = c("Model", 
+                    "Odds Ratio Intercept", 
+                    "Odds Ratio Age",
+                    "Odds Ratio Female",
+                    "Odds Ratio Other Hispanic",
+                    "Odds Ratio Non-Hispanic White", 
+                    "Odds Ratio Non-Hispanic Black",
+                    "Odds Ratio Other Race",
+                    "Odds Ratio PIR",
+                    "Sample Size", 
+                    "Pseudo R-squared", 
+                    "AIC"))
+```
+
+### d
+```{r}
+# Summary model 3
+summary(model3)
+```
+To test whether the odds of men and women being wears of glasess/contact lenses for distance vision differs, we only need to look at the summary table of the model 3. On the gender2 (female) row, a hypothesis test was automatically done by R telling us whether there is a difference between the odds. As the table shown, the z-value is 9.487, and the p-value is < 2e-16, which is significantly less than the significance level 0.05, rejecting the null hypothesis that the odds of men and women being wears of glasess/contact lenses for distance vision do not differ. We have enough evidence to conclude that they differ.    
+
+
+To test whether the proportion of wearers of glasses/contact lenses for distance vision differs between men and women, we shall use a chi-squared test.     
+```{r}
+# Perform chi-squared test
+chisq_test <- chisq.test(table(df_cleaned_for_pc$gender, df_cleaned_for_pc$is_glass))
+chisq_test
+```
+From the summary above, the test statistic is 70.593 and the degree of freedom is 1. The p-value for the Chi-squared test is < 2.2e-16. So we reject the null hypothesis that the proportions of men and women being wears of glasess/contact lenses for distance vision do not differ. We have enough evidence to conclude that the proportions differ.
+
+### Reference for Problem 1
+#### Calculate odds ratio
+https://stackoverflow.com/questions/41384075/r-calculate-and-interpret-odds-ratio-in-logistic-regression
+#### Calculate pseudo-R^2
+https://search.r-project.org/CRAN/refmans/DescTools/html/PseudoR2.html
+
+
