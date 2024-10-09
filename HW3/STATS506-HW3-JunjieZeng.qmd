@@ -210,3 +210,48 @@ From the summary above, the test statistic is 70.593 and the degree of freedom i
 #### Calculate odds ratio
 
 https://stackoverflow.com/questions/41384075/r-calculate-and-interpret-odds-ratio-in-logistic-regression \#### Calculate pseudo-R\^2 https://search.r-project.org/CRAN/refmans/DescTools/html/PseudoR2.html
+
+
+## Problem 2
+
+### a
+```{r}
+# Packages
+library(DBI)
+library(RSQLite)
+```
+
+```{r}
+# Import the SQLite database of the sakila data
+sakila <- dbConnect(RSQLite::SQLite(), "/Users/junjiezeng/Desktop/git/STATS506/HW3/sakila_master.db")
+sakila
+```
+```{r}
+dbListTables(sakila)
+dbListFields(sakila, 'film')
+```
+
+```{r}
+dbGetQuery(sakila, "
+SELECT release_year, COUNT(*) AS Num_films
+  FROM film
+  WHERE release_year = (SELECT MIN(release_year) FROM film)
+")
+```
+
+### b
+```{r}
+# Method 1
+
+
+
+# Method 2
+dbGetQuery(sakila, '
+SELECT 
+  FROM film
+GROUP BY 
+
+')
+
+
+```
