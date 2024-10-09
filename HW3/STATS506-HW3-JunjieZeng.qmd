@@ -241,17 +241,81 @@ SELECT release_year, COUNT(*) AS Num_films
 
 ### b
 ```{r}
+library(tidyverse)
+```
+
+```{r}
 # Method 1
-
-
-
-# Method 2
-dbGetQuery(sakila, '
-SELECT 
-  FROM film
-GROUP BY 
-
+df <- dbGetQuery(sakila, '
+SELECT f.film_id, fcc.category_id, fcc.name
+  FROM film AS f
+      INNER JOIN
+      (SELECT c.category_id, c.name, fc.film_id
+         FROM category as c
+              INNER JOIN film_category AS fc ON c.category_id = fc.category_id) AS fcc ON f.film_id = fcc.film_id
 ')
 
-
+df |> 
+  group_by(name) |> 
+  summarize(total = n()) |> 
+  arrange(total)
 ```
+Music movie is the least common in the data, there are 51 movies of this genre. 
+
+
+```{r}
+# Method 2
+dbGetQuery(sakila, '
+SELECT f.film_id, fcc.category_id, fcc.name, COUNT(*) AS count
+  FROM film AS f
+      INNER JOIN
+      (SELECT c.category_id, c.name, fc.film_id
+         FROM category as c
+              INNER JOIN film_category AS fc ON c.category_id = fc.category_id) AS fcc ON f.film_id = fcc.film_id
+  GROUP BY fcc.name
+  ORDER BY count
+  LIMIT 1
+')
+```
+
+Same result as the method 1. Music movie is the least common in the data, there are 51 movies of this genre.    
+
+
+### c
+
+```{r}
+# Method 1
+df2 <- dbGetQuery(sakila, '
+SELECT cocia.country
+  FROM customer AS c
+    INNER JOIN 
+    (SELECT a.address_id, co.country
+       FROM address AS a
+         INNER JOIN city AS ci ON a.city_id = ci.city_id
+         INNER JOIN country AS co ON ci.country_id = co.country_id) AS cocia
+     ON cocia.address_id = c.address_id
+')
+
+df2 |> 
+  group_by(country) |> 
+  summarize(total = n()) |> 
+  filter(total == 13)
+```
+Argentina and Nigeria are countries have exactly 13 customers. 
+
+```{r}
+# Method 2
+dbGetQuery(sakila, '
+SELECT cocia.country, COUNT(*) AS customer_count
+  FROM customer AS c
+    INNER JOIN 
+    (SELECT a.address_id, co.country
+       FROM address AS a
+         INNER JOIN city AS ci ON a.city_id = ci.city_id
+         INNER JOIN country AS co ON ci.country_id = co.country_id) AS cocia
+     ON cocia.address_id = c.address_id
+  GROUP BY cocia.country
+  HAVING COUNT(*) = 13
+')
+```
+Same as the method 1, Argentina and Nigeria are countries have exactly 13 customers.
