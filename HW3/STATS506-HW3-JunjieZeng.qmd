@@ -1,7 +1,9 @@
 ---
 title: "STATS506-HW3-JunjieZeng"
 author: "Junjie Zeng"
-format: html
+format: 
+  html:
+    embed-resources: true
 editor: visual
 ---
 
@@ -69,7 +71,7 @@ kable(glass_prop,
       format = "html", 
       caption = "Proportion of Wearing Glasses/Contact Lenses", 
       col.names = c("Age", "Wearing Glasses/Contacts", "Total", "Proportion"),
-      digits = 2)
+      digits = 3)
 ```
 
 ### c
@@ -98,7 +100,7 @@ model3 <- glm(is_glass ~ age + race + gender + PIR, data = df_cleaned_for_pc, fa
 ```
 
 ```{r}
-
+# Create a function to get model summary
 model_summary <- function(lg) {
   odds_ratio <- exp(coef(lg))
   pseudo_r2 <- PseudoR2(lg)["McFadden"]
@@ -111,13 +113,14 @@ model_summary <- function(lg) {
               sample_size = sample_size))
 }
 
-
+# Use the functions to get summaries
 model1_summary <- model_summary(model1)
 model2_summary <- model_summary(model2)
 model3_summary <- model_summary(model3)
 ```
 
 ```{r}
+# Create a raw summary table 
 table_models <- data.frame(
   Model = c("Age", 
             "Age, Race, Gender", 
@@ -170,6 +173,7 @@ table_models <- data.frame(
 ```
 
 ```{r}
+# Make the table look nicer
 kable(table_models, 
       format = "html", 
       col.names = c("Model", 
@@ -211,10 +215,10 @@ From the summary above, the test statistic is 70.593 and the degree of freedom i
 
 https://stackoverflow.com/questions/41384075/r-calculate-and-interpret-odds-ratio-in-logistic-regression \#### Calculate pseudo-R\^2 https://search.r-project.org/CRAN/refmans/DescTools/html/PseudoR2.html
 
-
 ## Problem 2
 
 ### a
+
 ```{r}
 # Packages
 library(DBI)
@@ -226,12 +230,14 @@ library(RSQLite)
 sakila <- dbConnect(RSQLite::SQLite(), "/Users/junjiezeng/Desktop/git/STATS506/HW3/sakila_master.db")
 sakila
 ```
+
 ```{r}
 dbListTables(sakila)
 dbListFields(sakila, 'film')
 ```
 
 ```{r}
+# What year is the oldest movie from, and how many movies were released in that year
 dbGetQuery(sakila, "
 SELECT release_year, COUNT(*) AS Num_films
   FROM film
@@ -240,7 +246,9 @@ SELECT release_year, COUNT(*) AS Num_films
 ```
 
 ### b
+
 ```{r}
+# Package
 library(tidyverse)
 ```
 
@@ -258,17 +266,18 @@ SELECT f.film_id, fcc.category_id, fcc.name
 df |> 
   group_by(name) |> 
   summarize(total = n()) |> 
-  arrange(total)
+  arrange(total) |> 
+  head(1)
 ```
-Music movie is the least common in the data, there are 51 movies of this genre. 
 
+Music movie is the least common in the data, there are 51 movies of this genre.
 
 ```{r}
 # Method 2
 dbGetQuery(sakila, '
 SELECT f.film_id, fcc.category_id, fcc.name, COUNT(*) AS count
   FROM film AS f
-      INNER JOIN
+    INNER JOIN
       (SELECT c.category_id, c.name, fc.film_id
          FROM category as c
               INNER JOIN film_category AS fc ON c.category_id = fc.category_id) AS fcc ON f.film_id = fcc.film_id
@@ -277,9 +286,7 @@ SELECT f.film_id, fcc.category_id, fcc.name, COUNT(*) AS count
   LIMIT 1
 ')
 ```
-
-Same result as the method 1. Music movie is the least common in the data, there are 51 movies of this genre.    
-
+Same result as the method 1. Music movie is the least common in the data, there are 51 movies of this genre.
 
 ### c
 
@@ -301,7 +308,8 @@ df2 |>
   summarize(total = n()) |> 
   filter(total == 13)
 ```
-Argentina and Nigeria are countries have exactly 13 customers. 
+
+Argentina and Nigeria are countries have exactly 13 customers.
 
 ```{r}
 # Method 2
@@ -318,4 +326,104 @@ SELECT cocia.country, COUNT(*) AS customer_count
   HAVING COUNT(*) = 13
 ')
 ```
+
 Same as the method 1, Argentina and Nigeria are countries have exactly 13 customers.
+
+## Problem 3
+
+### a
+
+```{r}
+# Load data
+data <- read.csv("/Users/junjiezeng/Desktop/git/STATS506/HW3/us-500.csv")
+head(data)
+```
+
+```{r}
+# Get proportion by adding a binary column and calculate the mean
+data |> 
+  select(email) |> 
+  mutate(is_dotcom = ifelse(str_detect(email, ".com"), 1, 0)) |> 
+  summarize(mean(is_dotcom))
+```
+
+So, 73.4 percent of email addresses are hosted at a domain with TLD “.com”.
+
+### b
+
+```{r}
+# Check for non-alphanumeric characters
+# First find non-alphanumeric characters other than @ and .
+# then find ones with multiple @ and .
+data |> 
+  mutate(non_an = str_detect(email, "[^a-zA-Z0-9@.]") | 
+                     str_count(email, "@") > 1 | 
+                     str_count(email, "\\.") > 1 )|> 
+  summarize(proportion = mean(non_an))
+
+```
+
+So, 50.6 percent of email addresses have at least one non alphanumeric character in them.
+
+### c
+
+```{r}
+# Check any na values in phone1, phone2
+anyNA(data$phone1)
+anyNA(data$phone2)
+```
+
+```{r}
+# Check whether area_code same for all phone1 and phone2
+all(substr(data$phone1, 1, 3) == substr(data$phone2, 1, 3))
+```
+
+```{r}
+# Since area_code same for all phone1 and phone2, 
+# its enough to look at phone1 only
+data |> 
+  mutate(area_code = substr(phone1, 1, 3)) |>            
+  group_by(area_code) |> 
+  summarize(total = n()) |> 
+  arrange(desc(total)) |> 
+  head(5)
+```
+
+The top 5 most common area codes amongst all phone numbers are 973, 212, 215, 410, and 201.
+
+### d
+
+```{r}
+# Get some data to look at
+data$address |> 
+  head(20)
+```
+
+```{R}
+# Extract apartment numbers and create a histogram
+log_add_hist_d <- data |> 
+  select(address) |> 
+  # Get the number at end, take the log
+  mutate(apt_num = as.integer(str_extract(address, "[0-9]+$")),
+         log_apt_num = log(apt_num))|> 
+  filter(!is.na(apt_num) & !is.na(log_apt_num))
+
+hist(log_add_hist_d$log_apt_num)
+```
+
+### e
+
+```{R}
+first_nums <- log_add_hist_d |> 
+  select(apt_num) |> 
+  mutate(first_num = as.integer(substr(as.character(apt_num), 1, 1)))
+
+# Create the histogram
+hist(first_nums$first_num,
+     breaks = seq(0.5, 9.5, by = 1), 
+     xaxt = "n")                      
+
+axis(1, at = 1:9, labels = 1:9)
+
+```
+The histogram suggests a uniform distribution, which does not appear to follow Benford’s law. No, the apartment numbers would not pass as real data.     
