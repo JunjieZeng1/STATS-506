@@ -7,17 +7,18 @@ format:
 editor: visual
 ---
 
-# STATS506 Problem Set #2
+# STATS506 Problem Set #3
 
 ## Repository
 
 https://github.com/JunjieZeng1/STATS-506.git
 
-## Problem 1 Dice Game
+## Problem 1
 
 ### a
 
-```{r, warning = False}
+```{r}
+#| warning: false
 # Load packages
 library(haven)
 library(dplyr)
@@ -37,7 +38,6 @@ demo_d <- read_xpt("/Users/junjiezeng/Desktop/git/STATS506/HW3/DEMO_D.XPT")
 ```{r}
 # Merging data
 df <- data.frame(inner_join(vix_d, demo_d, by = "SEQN"))
-head(df)
 ```
 
 ```{r}
@@ -213,13 +213,16 @@ From the summary above, the test statistic is 70.593 and the degree of freedom i
 
 #### Calculate odds ratio
 
-https://stackoverflow.com/questions/41384075/r-calculate-and-interpret-odds-ratio-in-logistic-regression \#### Calculate pseudo-R\^2 https://search.r-project.org/CRAN/refmans/DescTools/html/PseudoR2.html
+https://stackoverflow.com/questions/41384075/r-calculate-and-interpret-odds-ratio-in-logistic-regression/       
+
+#### Calculate pseudo-R\^2     https://search.r-project.org/CRAN/refmans/DescTools/html/PseudoR2.html
 
 ## Problem 2
 
 ### a
 
 ```{r}
+#| warning: False
 # Packages
 library(DBI)
 library(RSQLite)
@@ -248,6 +251,7 @@ SELECT release_year, COUNT(*) AS Num_films
 ### b
 
 ```{r}
+#| warning: False
 # Package
 library(tidyverse)
 ```
@@ -275,7 +279,7 @@ Music movie is the least common in the data, there are 51 movies of this genre.
 ```{r}
 # Method 2
 dbGetQuery(sakila, '
-SELECT f.film_id, fcc.category_id, fcc.name, COUNT(*) AS count
+SELECT fcc.name, COUNT(*) AS count
   FROM film AS f
     INNER JOIN
       (SELECT c.category_id, c.name, fc.film_id
@@ -394,7 +398,7 @@ The top 5 most common area codes amongst all phone numbers are 973, 212, 215, 41
 ### d
 
 ```{r}
-# Get some data to look at
+# Look at some data
 data$address |> 
   head(20)
 ```
