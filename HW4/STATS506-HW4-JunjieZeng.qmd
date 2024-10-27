@@ -13,7 +13,7 @@ editor: visual
 
 https://github.com/JunjieZeng1/STATS-506.git
 
-Problem 1 - Tidyverse
+## Problem 1 - Tidyverse
 
 ```{r, warning=FALSE}
 # Libraries
@@ -55,3 +55,92 @@ flights |>
   arrange(-avg_speed) |> 
   slice(1)
 ```
+
+## Problem 2 - get_temp()
+
+```{r}
+# Load data
+nnmaps <- read.csv("/Users/junjiezeng/Desktop/git/STATS506/HW4/chicago-nmmaps.csv")
+```
+
+
+```{r}
+##' @title Get the average temperature for a given month
+##' @param month Month, either a numeric 1-12 or a string
+##' @param year A numeric year
+##' @param data The data set to obtain data from
+##' @param celsius Logically indicating whther the results should be in celsius. Default FALSE.
+##' @param average_fn A function with which to compute the mean. Default is mean.
+##' @return The average temperature for a given month, a numeric vector of length 1
+get_temp <- function(month, year, data, celsius=FALSE, average_fn=mean){
+  colnames(data) <- c("city", "date", "temp", "o3", "dewpoint", "pm10", 
+                     "season", "yday", "monthh", "month_numeric", "yearr")
+  
+  if (month |> is.numeric()){
+    if(month > 12 | month < 1){
+      stop("Month should between 1 and 12")
+    }
+  }
+  else if (month |> is.character()){
+    if (!(month %in% c("January", "February", "March", "April", "May", "June", "July",
+                      "August", "September", "October", "November", "December"))){
+      if(!(month %in% c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
+                      "Aug", "Sep", "Oct", "Nov", "Dec"))){
+        stop("Invalid month name")
+      }
+    }
+  }
+  else{
+    stop("Month should be either a numeric value or a month name")
+  }
+  
+  if (!(year |>  is.numeric())) {
+      stop("year should be numeric")
+  }
+  if (year < min(data$yearr) | year > max(data$yearr)) {
+      stop("year out of range")
+  }
+  if (!(average_fn |>  is.function())) {
+      stop("average_fn should be a function")
+  }
+  
+  data |> 
+    select(yearr, monthh, month_numeric, temp) |> 
+    filter(yearr == year, 
+           monthh == month | month_numeric == month | monthh == substring(month, 1, 3)) |> 
+    summarize(avg_temp = average_fn(temp)) |> 
+    mutate(avg_temp = ifelse(celsius, (avg_temp - 32) * (5 / 9), avg_temp)) |> 
+    slice(1) |> 
+    pull(avg_temp) -> output
+  
+  return(output)
+}
+```
+
+```{r}
+get_temp("Apr", 1999, data = nnmaps)
+get_temp("Apr", 1999, data = nnmaps, celsius = TRUE)
+get_temp(10, 1998, data = nnmaps, average_fn = median)
+```
+```{r}
+get_temp(13, 1998, data = nnmaps)
+```
+```{r}
+get_temp(2, 2005, data = nnmaps)
+```
+```{r}
+get_temp("November", 1999, data =nnmaps, celsius = TRUE,
+         average_fn = function(x) {
+           x %>% sort -> x
+           x[2:(length(x) - 1)] %>% mean %>% return
+         })
+```
+
+## Problem 3
+```{r}
+# Load data
+art_sales <- read.csv("/Users/junjiezeng/Desktop/git/STATS506/HW4/df_for_ml_improved_new_market.csv")
+```
+
+
+
