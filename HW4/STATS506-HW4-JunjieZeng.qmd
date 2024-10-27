@@ -1,0 +1,57 @@
+---
+title: "STATS506-HW4-JunjieZeng"
+author: "JunjieZeng"
+format: 
+  html:
+    embed-resources: true
+editor: visual
+---
+ 
+# STATS506 Problem Set #4
+
+## Repository
+
+https://github.com/JunjieZeng1/STATS-506.git
+
+Problem 1 - Tidyverse
+
+```{r, warning=FALSE}
+# Libraries
+library(tidyverse)
+library(dplyr)
+library(nycflights13)
+```
+
+```{r}
+# Load data
+head(flights)
+
+flights |> 
+  group_by(origin) |> 
+  summarize(avg_dep_delay = mean(dep_delay, na.rm = TRUE), 
+            median_dep_delay = median(dep_delay, na.rm = TRUE)) |> 
+  select(airport = origin, avg_dep_delay, median_dep_delay) |> 
+  arrange(-avg_dep_delay) 
+
+
+flights |> 
+    group_by(dest) |> 
+    filter(n() >= 10) |> 
+    summarize(avg_arr_delay = mean(arr_delay, na.rm = TRUE), 
+              median_arr_delay = median(arr_delay, na.rm = TRUE)) |> 
+    select(airport = dest, avg_arr_delay, median_arr_delay) |> 
+    arrange(-avg_arr_delay) 
+```
+
+```{r}
+head(planes)
+
+flights |> 
+  inner_join(planes, by = "tailnum") |> 
+  mutate(speed_flights = distance / (air_time / 60)) |> 
+  group_by(model) |> 
+  summarize(avg_speed = mean(speed_flights, na.rm = TRUE), 
+         total_flights = n()) |> 
+  arrange(-avg_speed) |> 
+  slice(1)
+```
