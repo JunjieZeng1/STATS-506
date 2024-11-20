@@ -1,0 +1,136 @@
+---
+title: "STATS506-HW5-JunjieZeng"
+format: html
+editor: visual
+---
+
+## Problem 1
+
+### a
+ 
+```{r}
+library(Rcpp)
+```
+
+```{r}
+# Define class 'rational'
+rational <- setClass("rational", 
+                     slots = c(numerator = "numeric",
+                               denominator = "numeric"))
+
+# Constructor
+newRational <- function(Numerator, Denominator){
+  return(new("rational", numerator = Numerator, denominator = Denominator))
+}
+
+# Validator that ensures the denominator is non-zero
+setValidity("rational", function(object){
+  if(object@denominator == 0){
+    stop(paste("@denominator = ", object@denominator, "should not be zero"))
+  }
+})
+
+# show method
+setMethod("show", "rational", function(object){
+  cat(object@numerator, "/", object@denominator, "\n", sep = "")
+})
+
+# simplify method
+cppFunction("
+int getGcd(int x, int y) {
+ return  std::gcd(x, y);
+}")
+
+cppFunction("
+int getLcm(int x, int y) {
+ return  std::lcm(x, y);
+}")
+
+
+setGeneric("simplify", function(object) {
+  standardGeneric("simplify")
+})
+
+setMethod("simplify", "rational", function(object){
+  gcd <- getGcd(object@numerator, object@denominator)
+  return(newRational(object@numerator / gcd, object@denominator / gcd))
+})
+
+# quotient method
+setGeneric("quotient", function(object, digits=NULL) {
+  standardGeneric("quotient")
+})
+
+setMethod("quotient", "rational", function(object, digits=NULL){
+  if (is.null(digits)){
+    return(object@numerator / object@denominator)
+  }
+  if (!(is.numeric(digits) && digits %% 1 == 0)){
+    stop(paste("digits should be an integer"))
+  }
+  return(round(object@numerator / object@denominator, digits))
+})
+
+# Addition
+getMethod("+")
+setMethod("+", signature(e1 = "rational",
+                         e2 = "rational"),
+  function(e1, e2) {
+    return(newRational(e1@numerator * e2@denominator + e2@numerator * e1@denominator, e1@denominator * e2@denominator))
+  })
+
+# Subtraction
+getMethod("-")
+setMethod("-", signature(e1 = "rational",
+                         e2 = "rational"),
+  function(e1, e2) {
+    return(newRational(e1@numerator * e2@denominator - e2@numerator * e1@denominator, e1@denominator * e2@denominator))
+  })
+
+# Multiplication
+getMethod("*")
+setMethod("*", signature(e1 = "rational",
+                         e2 = "rational"),
+  function(e1, e2) {
+    return(newRational(e1@numerator * e2@numerator, e1@denominator * e2@denominator))
+  })
+
+# Division
+getMethod("/")
+setMethod("/", signature(e1 = "rational",
+                         e2 = "rational"),
+  function(e1, e2) {
+    return(newRational(e1@numerator * e2@denominator, e1@denominator * e2@numerator))
+  })
+```
+
+### b
+
+```{r}
+r1 <- newRational(24, 6)
+r2 <- newRational(7, 230)
+r3 <- newRational(0, 4)
+```
+
+```{r, error=TRUE}
+r1
+r3
+r1 + r2
+r1 - r2
+r1 * r2
+r1 / r2
+r1 + r3
+r1 * r3
+r2 / r3
+quotient(r1)
+quotient(r2)
+quotient(r2, digits = 3)
+quotient(r2, digits = 3.14)
+quotient(r2, digits = "avocado")
+q2 <- quotient(r2, digits = 3)
+q2
+quotient(r3)
+simplify(r1)
+simplify(r2)
+simplify(r3)
+```
