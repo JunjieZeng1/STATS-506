@@ -3,7 +3,7 @@ title: "STATS506-FinalProject-JunjieZeng"
 format: html
 editor: visual
 ---
- 
+
 ```{r}
 # Define distributions
 distributions <- c("Normal", 
