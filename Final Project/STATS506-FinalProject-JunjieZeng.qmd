@@ -1,0 +1,234 @@
+---
+title: "STATS506-FinalProject-JunjieZeng"
+format: html
+editor: visual
+---
+
+```{r}
+# Define distributions
+distributions <- c("Normal", 
+                   "Uniform", 
+                   "mixture",
+                   "Exponential0.5", 
+                   "Exponential1", 
+                   "Exponential2",
+                   "Exponential5",
+                   "T1",
+                   "T2",
+                   "T5",
+                   "T10")
+
+# Define sample sizes and number of simulations
+sample_sizes <- c(5, 10, 20, 50, 100, 200, 500, 1000, 10000)
+n_simulations <- 100000
+alpha <- 0.05
+```
+
+```{r}
+set.seed(506)
+# Simulation loop
+for (distribution in distributions) {
+  type1_errors <- rep(NA, length(sample_sizes)) 
+
+  for (i in seq_along(sample_sizes)) {
+    N <- sample_sizes[i] 
+    p_values <- rep(NA, n_simulations)
+    
+    for (j in 1:n_simulations){
+      sample_data <- get_data(distribution, N) 
+      x_bar[j] <- mean(sample_data)
+      t_test <- t.test(sample_data, mu = 0) 
+      p_values[j] <- t_test$p.value
+    }
+
+    type1_error_rate <- mean(p_values < alpha)
+    type1_errors[i] <- type1_error_rate
+  }
+  
+  results[[distribution]] <- data.frame(
+    SampleSize = sample_sizes,
+    TypeIError = type1_errors
+  )
+}
+```
+
+```{r}
+library(tidyverse)
+t_dist_errors <- results$T1 |> 
+  inner_join(results$T2, by ="SampleSize") |> 
+  inner_join(results$T5, by ="SampleSize") |> 
+  inner_join(results$T10, by ="SampleSize")
+
+colnames(t_dist_errors) <- c('SampleSize', 'df=1','df=2','df=5','df=10')
+t_dist_errors <- t_dist_errors %>%
+  mutate(across(-SampleSize, ~ round(.x, 3)))
+
+t_dist_errors
+
+library(ggplot2)
+
+ t_dist_errors %>%
+  pivot_longer(cols = -SampleSize, names_to = "Degrees_of_Freedom", values_to = "TypeIErrorRate") |> 
+  ggplot(aes(x = SampleSize, y = TypeIErrorRate, color = Degrees_of_Freedom)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_x_log10(breaks = sample_sizes, labels = sample_sizes) +
+  labs(
+    title = "Type I Error Rates for t-Distributions",
+    x = "Sample Size (log scale)",
+    y = "Type I Error Rate",
+    color = "Degrees of Freedom")
+```
+Reference: ChatGPT for the use of `scale_x_log10` to put all sample sizes on x-axis
+
+```{r}
+exp_dist_errors <- results$Exponential0.5 |> 
+  inner_join(results$Exponential1, by ="SampleSize") |> 
+  inner_join(results$Exponential2, by ="SampleSize") |> 
+  inner_join(results$Exponential5, by ="SampleSize")
+
+colnames(exp_dist_errors) <- c('SampleSize', 
+                               'lambda = 0.5',
+                               'lambda = 1',
+                               'lambda = 2',
+                               'lambda = 5')
+exp_dist_errors <- exp_dist_errors %>%
+  mutate(across(-SampleSize, ~ round(.x, 3)))
+
+exp_dist_errors
+exp_dist_errors %>%
+  pivot_longer(cols = -SampleSize, names_to = "Lambda", values_to = "TypeIErrorRate") |> 
+  ggplot(aes(x = SampleSize, y = TypeIErrorRate, color = Lambda)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_x_log10(breaks= sample_sizes, labels = sample_sizes) + 
+  scale_y_continuous(breaks = seq(0, 0.2, 0.01)) +
+  labs(
+    title = "Type I Error Rates for Exponential Distributions",
+    x = "Sample Size (log scale)",
+    y = "Type I Error Rate",
+    color = "Lambda"
+  )
+
+```
+```{R}
+normal_dist_errors <- results$Normal
+normal_dist_errors <- normal_dist_errors %>%
+  mutate(across(-SampleSize, ~ round(.x, 3)))
+
+normal_dist_errors
+
+ggplot(normal_dist_errors, aes(x = SampleSize, y = TypeIError)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_x_log10(breaks= sample_sizes, labels = sample_sizes) + 
+    scale_y_continuous(
+    breaks = seq(0.045, 0.055, 0.005),
+    limits = c(0.045, 0.055)
+  ) +
+  labs(
+    title = "Type I Error Rates for Normal Distribution",
+    x = "Sample Size (log scale)",
+    y = "Type I Error Rate"
+  )
+
+```
+```{r}
+uniform_dist_errors <- results$Uniform
+uniform_dist_errors <- uniform_dist_errors %>%
+  mutate(across(-SampleSize, ~ round(.x, 3)))
+uniform_dist_errors
+ggplot(uniform_dist_errors, aes(x = SampleSize, y = TypeIError)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_x_log10(breaks = sample_sizes,
+    labels = sample_sizes) + 
+    scale_y_continuous(
+    breaks = seq(0.045, 0.07, 0.005),
+    limits = c(0.045, 0.07)
+  ) +
+  labs(
+    title = "Type I Error Rates for Uniform Distribution",
+    x = "Sample Size (log scale)",
+    y = "Type I Error Rate"
+  )
+```
+```{r}
+mix_dist_errors <- results$mixture
+mix_dist_errors <- mix_dist_errors %>%
+  mutate(across(-SampleSize, ~ round(.x, 3)))
+mix_dist_errors
+
+ggplot(mix_dist_errors, aes(x = SampleSize, y = TypeIError)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_x_log10(breaks = sample_sizes, labels = sample_sizes) + 
+    scale_y_continuous(
+    breaks = seq(0.045, 0.07, 0.005),
+    limits = c(0.045, 0.07)
+  ) +
+  labs(
+    title = "Type I Error Rates for Bimodal Normal Distribution",
+    x = "Sample Size (log scale)",
+    y = "Type I Error Rate"
+  )
+```
+```{r}
+set.seed(1235)                            
+
+n <- 500
+y1 <- rnorm(n, -5, 2) 
+y2 <- rnorm(n, 5, 2)  
+w <- rbinom(n, 1, 0.5)
+x2 <- w * y1 + (1 - w) * y2  
+
+hist(x2, prob = TRUE, col = "grey", ylim = c(0, 0.1), main = "Normal Mixture",breaks = 30)
+curve(0.5 * dnorm(x, -5, 2) + 0.5 * dnorm(x, 5, 2), lwd = 2, col = "blue", add = TRUE)
+```
+Reference: https://math.stackexchange.com/questions/2149570/how-to-generate-sample-from-bimodal-distribution for learning how to get samples from bimodal distribution 
+
+
+```{r}
+# Comparison of Exponential Distributions
+
+par(mar = c(4, 4, 2, 1))
+x <- seq(0, 5, by = 0.01)
+hx <- dnorm(x)
+
+lambda <- c(0.5, 1, 2, 5)
+colors <- c("red", "blue", "darkgreen", "brown", "black")
+labels <- c(expression(paste(lambda, "=0.5")), 
+            expression(paste(lambda, "=1")),
+            expression(paste(lambda, "=2")),
+            expression(paste(lambda, "=5")))
+
+plot(x, dexp(x,lambda[2]), type="l", lty=1, xlab="x value",
+     ylab="Density", main="Comparison of Exponential Distributions")
+
+for (i in c(1,3,4)){
+    lines(x, dexp(x,lambda[i]), lwd=1, col=colors[i])
+}
+
+legend("topright", inset=.05, title="Distributions",
+       labels, lwd=1, lty=c(1, 1, 1, 1, 1), col=colors)
+```
+
+```{r}
+# Comparison of t Distributions
+
+par(mar = c(4, 4, 2, 1))
+x <- seq(-4, 4, by = 0.01)
+df <- c(1, 2, 5, 10)
+colors <- c("red", "blue", "darkgreen", "brown", "black")
+labels <- c("df=1", "df=2", "df=5", "df=10", "normal")
+
+plot(x, dnorm(x), type="l", lty=1, xlab="x value",
+     ylab="Density", main="Comparison of t Distributions")
+
+for (i in 1:4){
+    lines(x, dt(x,df[i]), lwd=1, col=colors[i])
+}
+
+legend("topright", inset=.05, title="Distributions",
+       labels, lwd=1, col=colors)
+```
